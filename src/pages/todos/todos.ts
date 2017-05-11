@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+
+import { TodoModel } from '../../shared/todo-model';
+import {AddTaskModal} from '../add-task-modal/add-task-modal';
 
 /**
  * Generated class for the Todos page.
@@ -14,39 +17,50 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class TodosPage {
 
-  public todos: any[];
+  public todos: TodoModel[];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad Todos');
     this.todos = [
-      {
-        description: "esto es una tarea",
-        isDone: false
-      },
-      {
-        description: "esto es otra tarea",
-        isDone: false
-      },
-      {
-        description: "esto es una tercera tarea",
-        isDone: false
-      },
-      {
-        description: "esto es una cuarta tarea",
-        isDone: false
-      },
-      {
-        description: "esto es una quinta tarea",
-        isDone: false
-      },
-      {
-        description: "esto es una sexta tarea",
-        isDone: false
-      }
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element", true),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element", false, true),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element"),
+      new TodoModel("this is an element", true),
+      new TodoModel("this is an element")
     ];
   }
 
+  setTodoStyles(item: TodoModel) {
+
+    let styles = {
+      'text-decoration': item.isDone ? 'line-through' : 'none',
+      'font-weight': item.isImportant ? '600' : 'normal'
+    };
+
+    return styles;
+  }
+
+  toogleTodo(todo: TodoModel) {
+    todo.isDone = !todo.isDone;
+  }
+
+  showAddTodo(){
+    let modal = this.modalCtrl.create(AddTaskModal);
+    modal.present();
+  }
 }
