@@ -27036,10 +27036,6 @@ ion-navbar.toolbar {
   }
 }
 
-page-add-task-modal ion-list {
-  height: 100%;
-}
-
 page-add-task-modal .container {
   height: 100%;
   display: -webkit-flex;
