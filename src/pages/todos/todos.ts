@@ -59,8 +59,18 @@ export class TodosPage {
     todo.isDone = !todo.isDone;
   }
 
+  addTodo(todo: TodoModel) {
+    this.todos.push(todo);
+  }
+
   showAddTodo(){
     let modal = this.modalCtrl.create(AddTaskModal);
     modal.present();
+
+    modal.onDidDismiss(data => {
+      if(data) {
+        this.addTodo(data);
+      }
+    });
   }
 }
