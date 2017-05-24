@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, Platform } from 'ionic-angular';
 
 import { TodoModel } from '../../shared/todo-model';
-import {AddTaskModal} from '../add-task-modal/add-task-modal';
+import { ListModel } from '../../shared/list-model';
+import { TodoService } from '../../shared/todo-service';
+import { AddTaskModal } from '../add-task-modal/add-task-modal';
+
+
 
 /**
  * Generated class for the Todos page.
@@ -13,36 +17,30 @@ import {AddTaskModal} from '../add-task-modal/add-task-modal';
 @IonicPage()
 @Component({
   selector: 'page-todos',
-  templateUrl: 'todos.html',
+  templateUrl: 'todos.html'
 })
 export class TodosPage {
 
-  public todos: TodoModel[];
+  private toogleTodoTimeout = null;
+  private list: ListModel;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public modalCtrl: ModalController,
+    public todoService: TodoService,
+    private platform: Platform) {
+
+      this.list = this.navParams.get('list');
+      this.todoService.loadFromList(this.list.id);
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad Todos');
-    this.todos = [
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element", true),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element", false, true),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element"),
-      new TodoModel("this is an element", true),
-      new TodoModel("this is an element")
-    ];
+  }
+
+  ionViewWillUnload() {
+    this.todoService.saveLocally(this.list.id);
   }
 
   setTodoStyles(item: TodoModel) {
@@ -56,11 +54,28 @@ export class TodosPage {
   }
 
   toogleTodo(todo: TodoModel) {
-    todo.isDone = !todo.isDone;
+    if(this.toogleTodoTimeout)
+      return;
+
+    this.toogleTodoTimeout = setTimeout(() => {
+    this.todoService.toogleTodo(todo);
+    this.toogleTodoTimeout = null;
+    }, this.platform.is('ios') ? 0: 300);
   }
 
-  addTodo(todo: TodoModel) {
-    this.todos.push(todo);
+  removeTodo(todo: TodoModel) {
+    this.todoService.removeTodo(todo);
+  }
+
+  showEditTodo(todo: TodoModel) {
+    let modal = this.modalCtrl.create(AddTaskModal, {todo});
+
+    modal.present();
+    modal.onDidDismiss(data=> {
+      if(data) {
+        this.todoService.updateTodo(todo, data);
+      }
+    });
   }
 
   showAddTodo(){
@@ -69,7 +84,7 @@ export class TodosPage {
 
     modal.onDidDismiss(data => {
       if(data) {
-        this.addTodo(data);
+        this.todoService.addTodo(data);
       }
     });
   }
