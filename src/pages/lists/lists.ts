@@ -19,6 +19,8 @@ import { ListModel } from '../../shared/list-model';
 })
 export class ListsPage {
 
+  public selectedList: ListModel = null;
+
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams, 
@@ -32,6 +34,7 @@ export class ListsPage {
   }
 
   goToList(list: ListModel) {
+    this.clearSelectedList();
     this.navCtrl.push(TodosPage, {list});
   }
 
@@ -71,6 +74,23 @@ export class ListsPage {
     });
 
     addListAlert.present();
+  }
+
+  clearSelectedList() {
+    this.selectedList = null;
+  }
+
+  selectList(list: ListModel) {
+    if(this.selectedList == list) {
+      this.clearSelectedList();
+    } else {
+      this.selectedList = list;
+    }
+  }
+
+  removeSelectedList() {
+    this.listsService.removeList(this.selectedList);
+    this.selectedList = null;
   }
 
 }

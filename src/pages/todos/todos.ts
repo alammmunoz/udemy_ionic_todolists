@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, Platform, LoadingController } from 'ionic-angular';
 
 import { TodoModel } from '../../shared/todo-model';
 import { ListModel } from '../../shared/list-model';
@@ -29,7 +29,8 @@ export class TodosPage {
     public navParams: NavParams, 
     public modalCtrl: ModalController,
     public todoService: TodoService,
-    private platform: Platform) {
+    private platform: Platform,
+    private loadingCtrl: LoadingController) {
 
       this.list = this.navParams.get('list');
       this.todoService.loadFromList(this.list.id);
@@ -64,7 +65,17 @@ export class TodosPage {
   }
 
   removeTodo(todo: TodoModel) {
-    this.todoService.removeTodo(todo);
+    let loader = this.loadingCtrl.create();
+    loader.present();
+    this.todoService.removeTodo(todo)
+    .subscribe(() => loader.dismiss(), ()=> loader.dismiss());
+  }
+
+  updateTodo(originalTodo: TodoModel, modifiedTodo: TodoModel) {
+    let loader = this.loadingCtrl.create();
+    loader.present();
+    this.todoService.updateTodo(originalTodo, modifiedTodo)
+    .subscribe(() => loader.dismiss(), () => loader.dismiss());
   }
 
   showEditTodo(todo: TodoModel) {
@@ -73,18 +84,25 @@ export class TodosPage {
     modal.present();
     modal.onDidDismiss(data=> {
       if(data) {
-        this.todoService.updateTodo(todo, data);
+        this.updateTodo(todo, data);
       }
     });
   }
 
+  addTodo(todo: TodoModel) {
+    let loader = this.loadingCtrl.create();
+    loader.present();
+    this.todoService.addTodo(todo)
+    .subscribe(() => loader.dismiss(), () => loader.dismiss());
+  }
+
   showAddTodo(){
-    let modal = this.modalCtrl.create(AddTaskModal);
+    let modal = this.modalCtrl.create(AddTaskModal, {listId: this.list.id});
     modal.present();
 
     modal.onDidDismiss(data => {
       if(data) {
-        this.todoService.addTodo(data);
+        this.addTodo(data);
       }
     });
   }

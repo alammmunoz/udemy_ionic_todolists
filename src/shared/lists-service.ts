@@ -92,4 +92,23 @@ export class ListsService {
       this.local.set('lists', this.lists);
     })
   }
+
+  private deleteListFromServer(id: number) {
+    let observable = this.http.delete(`${AppSettings.API_ENDPOINT}/lists/${id}`)
+    .map(response => response.json()).share();
+
+    return observable;
+  }
+
+  public removeList(list: ListModel) {
+    this.deleteListFromServer(list.id).subscribe(
+      () => {
+        let index = this.lists.indexOf(list);
+        this.lists = [...this.lists.slice(0, index),
+                      ...this.lists.slice(index +1)];
+        this.saveLocally();
+      },
+      (error) => {console.log(`an error ocurred while trying to remove list: ${list.name}`);}
+    )
+  }
 }

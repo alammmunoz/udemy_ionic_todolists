@@ -27107,6 +27107,12 @@ page-lists ion-list ion-item .input-wrapper {
   text-align: center;
 }
 
+page-lists ion-list ion-item.selected-list {
+  background-color: #DDD;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.6) !important;
+  transition: background-color 0.3s ease-out;
+}
+
 page-todos .warning {
   color: red;
 }
